@@ -1,13 +1,18 @@
 from faker import Faker
 from random import choice, randint
-from json import json
+import json
+import time
 
-from confluent_kafka import KafkaProducer, AdminClient, NewTopic
+from confluent_kafka import Producer
+from confluent_kafka.admin import AdminClient, NewTopic
 
 #  ---------- KAFKA ---------- #
 # Kafka broker address
-bootstrap_servers = 'localhost:9092'
+bootstrap_servers = 'kafka:9092' # kafka address is the docker container running kafka
 admin_client = AdminClient({'bootstrap.servers': bootstrap_servers})
+
+# Create a Kafka producer
+producer = Producer({'bootstrap.servers': bootstrap_servers})
 
 # Define the topic name and settings
 topic_name = 'tennis-match-events'
@@ -16,10 +21,7 @@ replication_factor = 1
 
 new_topic = NewTopic(topic_name, num_partitions, replication_factor)
 admin_client.create_topics([new_topic])
-admin_client.close()
-
-# Create a Kafka producer
-producer = KafkaProducer({'bootstrap.servers': bootstrap_servers})
+# admin_client.close() ############################# cause an error for whatever reason
 
 #  ---------- SETUP ---------- #
 
@@ -193,7 +195,6 @@ def play_match():
     message = {'winner': winner_name}
     producer.produce('tennis-match-events', value=json.dumps(message))
     producer.flush()
-    producer.close()
 
     return winner_name
             

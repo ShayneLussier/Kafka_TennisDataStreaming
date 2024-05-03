@@ -1,0 +1,12 @@
+FROM python:3.9
+
+WORKDIR /app
+
+# Install Python dependencies
+COPY requirements/requirements.tennis-simulator.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy script
+COPY scripts/tennis-simulator.py ./
+
+CMD ["sh", "-c", "sleep 30 && python tennis-simulator.py"]

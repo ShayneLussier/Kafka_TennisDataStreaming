@@ -1,0 +1,14 @@
+FROM python:3.9
+
+WORKDIR /app
+
+# Install Python dependencies
+COPY requirements/requirements.flask-app.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy Flask app and static files
+COPY scripts/flask-app.py ./
+COPY static/ ./static/
+COPY templates/ ./templates/
+
+CMD ["python", "flask-app.py"]

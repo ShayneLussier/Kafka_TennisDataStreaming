@@ -8,7 +8,7 @@ socketio = SocketIO(app)
 
 # Kafka consumer configuration
 consumer_conf = {
-    'bootstrap.servers': 'localhost:9092',
+    'bootstrap.servers': 'kafka:9092',
     'group.id': 'flask-consumer-group',
     'auto.offset.reset': 'earliest'
 }
@@ -37,4 +37,4 @@ def handle_connect():
         consumer.close()
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True) # Warning msg, should change server to gunicorn
