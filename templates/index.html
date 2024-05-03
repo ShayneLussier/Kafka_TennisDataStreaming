@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Display Winner</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+    <script type="text/javascript">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('connect', function() {
+            console.log('Connected to WebSocket server');
+        });
+
+        socket.on('winner_update', function(winnerName) {
+            document.getElementById('winner').innerText = winnerName;
+        });
+    </script>
+</head>
+<body>
+    <h1>Winner:</h1>
+    <div id="winner"></div>
+</body>
+</html>
