@@ -1,9 +1,11 @@
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from confluent_kafka import Consumer
-# import json
+import json
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # Kafka consumer setup
@@ -28,6 +30,7 @@ async def read_index(request: Request):
         print(f"Consumer error: {msg.error()}")
     else:
         message = msg.value().decode('utf-8')
-        winner = message.split("'")[3]  # Extract winner's name from the JSON message
+        winner_data = json.loads(message)
+        winner = winner_data.get('winner')
 
     return templates.TemplateResponse("index.html", {"request": request, "winner": winner})
