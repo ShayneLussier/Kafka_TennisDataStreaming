@@ -29,10 +29,10 @@ services:
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
 
-  flask-app:
+  fastapi-app:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile.flask-app
+      dockerfile: ./docker/Dockerfile.fastapi-app
     networks:
       - kafka-network
     ports:
@@ -48,7 +48,7 @@ services:
       - kafka-network
     depends_on:
       - kafka
-      - flask-app
+      - fastapi-app
     
 volumes:
   kafka_data:
