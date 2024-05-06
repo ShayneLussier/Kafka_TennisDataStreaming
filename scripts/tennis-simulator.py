@@ -19,6 +19,22 @@ topic_name = 'tennis-match-events'
 num_partitions = 1
 replication_factor = 1
 
+# Check if the topic already exists
+topic_metadata = admin_client.list_topics(timeout=5)
+topic_exists = topic_name in topic_metadata.topics
+
+if topic_exists:
+    # Delete the existing topic
+    print(f"Deleting existing topic: {topic_name}")
+    admin_client.delete_topics([topic_name])
+
+    # Wait for the topic to be deleted
+    while True:
+        topic_metadata = admin_client.list_topics(timeout=5)
+        if topic_name not in topic_metadata.topics:
+            break
+        time.sleep(1)
+
 new_topic = NewTopic(topic_name, num_partitions, replication_factor)
 admin_client.create_topics([new_topic])
 # admin_client.close() ############################# cause an error for whatever reason
