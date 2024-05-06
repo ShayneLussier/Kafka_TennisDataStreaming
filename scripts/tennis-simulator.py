@@ -121,16 +121,6 @@ def play_point(player1_name, player2_name):
     print_point_outcome(outcome, winner, player1_name, player2_name)
     return winner
 
-    # # Create message data ##########################################################################################
-    # message = {
-    #     "outcome": outcome,
-    #     "winner": winner
-    # }
-
-    # # Send message to Kafka topic
-    # producer.send('tennis-match-events', json.dumps(message))
-    # producer.flush()
-
 def play_game(player1_name, player2_name):
     """Simulates a single game and returns the winner."""
     player1_points = 0

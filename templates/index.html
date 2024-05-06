@@ -1,22 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Display Winner</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
-    <script type="text/javascript">
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
-
-        socket.on('connect', function() {
-            console.log('Connected to WebSocket server');
-        });
-
-        socket.on('winner_update', function(winnerName) {
-            document.getElementById('winner').innerText = winnerName;
-        });
-    </script>
+    <meta charset="UTF-8">
+    <title>Tennis Match Winner</title>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <h1>Winner:</h1>
-    <div id="winner"></div>
+    <div class="container">
+        <h1>Tennis Match Winner</h1>
+        {% if winner %}
+            <p>The winner is: {{ winner }}</p>
+        {% else %}
+            <p>Waiting for the match to finish...</p>
+        {% endif %}
+    </div>
 </body>
 </html>
