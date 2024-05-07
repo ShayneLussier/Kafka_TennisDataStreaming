@@ -18,11 +18,18 @@ consumer = Consumer({
 })
 consumer.subscribe(['tennis-match-events'])
 
+# Global variable to store the winner
+winner = None
+
 async def event_generator():
+    global winner
     while True:
-        msg = consumer.poll(1.0)
+        msg = consumer.poll(0.1)  # Poll every 100 milliseconds
+
         if msg is None:
-            await asyncio.sleep(1)
+            if winner:
+                yield f"data: {winner}\n\n"
+            await asyncio.sleep(0.01)  # Sleep for a short time to avoid excessive CPU usage
             continue
         elif msg.error():
             print(f"Consumer error: {msg.error()}")
