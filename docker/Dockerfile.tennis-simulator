@@ -9,4 +9,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy script
 COPY scripts/tennis-simulator.py ./
 
-CMD ["sh", "-c", "sleep 20 && python tennis-simulator.py"]
+CMD ["sh", "-c", "sleep 70 && python tennis-simulator.py"]
