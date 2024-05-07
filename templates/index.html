@@ -8,11 +8,16 @@
 <body>
     <div class="container">
         <h1>Tennis Match Winner</h1>
-        {% if winner %}
-            <p>The winner is: {{ winner }}</p>
-        {% else %}
-            <p>Waiting for the match to finish...</p>
-        {% endif %}
+        <p id="winner-message">Waiting for the match to finish...</p>
     </div>
+    <script>
+        const winnerMessage = document.getElementById('winner-message');
+
+        // Create EventSource for SSE endpoint
+        const eventSource = new EventSource('/sse');
+        eventSource.onmessage = function(event) {
+            winnerMessage.textContent = `The winner is: ${event.data}`;
+        };
+    </script>
 </body>
 </html>
