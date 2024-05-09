@@ -2,21 +2,67 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Tennis Match Winner</title>
+    <title>Tennis Match Score</title>
     <link rel="stylesheet" href="static/styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Tennis Match Winner</h1>
-        <p id="winner-message">Waiting for the match to finish...</p>
+        <h1>Tennis Match Score</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Sets</th>
+                    <th>Games</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="player1"></td>
+                    <td id="player1-sets">0</td>
+                    <td id="player1-games">0</td>
+                    <td id="player1-points">0</td>
+                </tr>
+                <tr>
+                    <td id="player2"></td>
+                    <td id="player2-sets">0</td>
+                    <td id="player2-games">0</td>
+                    <td id="player2-points">0</td>
+                </tr>
+            </tbody>
+        </table>
+        <p id="winner-message"></p>
     </div>
     <script>
-        const winnerMessage = document.getElementById('winner-message');
+        const player1NameElement = document.getElementById('player1');
+        const player2NameElement = document.getElementById('player2');
+        const player1SetsElement = document.getElementById('player1-sets');
+        const player2SetsElement = document.getElementById('player2-sets');
+        const player1GamesElement = document.getElementById('player1-games');
+        const player2GamesElement = document.getElementById('player2-games');
+        const player1PointsElement = document.getElementById('player1-points');
+        const player2PointsElement = document.getElementById('player2-points');
+        const winnerMessageElement = document.getElementById('winner-message');
 
         // Create EventSource for SSE endpoint
         const eventSource = new EventSource('/sse');
+
         eventSource.onmessage = function(event) {
-            winnerMessage.textContent = `The winner is: ${event.data}`;
+            const matchData = JSON.parse(event.data);
+
+            player1NameElement.textContent = matchData.player1 || '';
+            player2NameElement.textContent = matchData.player2 || '';
+            player1SetsElement.textContent = matchData.player1_sets;
+            player2SetsElement.textContent = matchData.player2_sets;
+            player1GamesElement.textContent = matchData.player1_games;
+            player2GamesElement.textContent = matchData.player2_games;
+            player1PointsElement.textContent = matchData.player1_points;
+            player2PointsElement.textContent = matchData.player2_points;
+
+            if (matchData.winner) {
+                winnerMessageElement.textContent = `The winner is: ${matchData.winner}`;
+            }
         };
     </script>
 </body>
