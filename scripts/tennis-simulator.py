@@ -1,19 +1,19 @@
 from faker import Faker
 from random import choice, randint
 import json
+import uuid
 import time
 from confluent_kafka import Producer
-
-#  ---------- KAFKA ---------- #
-# Kafka broker address
-bootstrap_servers = 'kafka:9092' # kafka address is the docker container running kafka
-
-# Create a Kafka producer
-producer = Producer({'bootstrap.servers': bootstrap_servers})
 
 #  ---------- SETUP ---------- #
 
 fake = Faker()
+
+# Kafka broker address
+bootstrap_servers = 'kafka:9092' # kafka address is the docker container running kafka
+# Create a Kafka producer
+producer = Producer({'bootstrap.servers': bootstrap_servers})
+match_id = str(uuid.uuid4()).replace("-", "")
 
 outcome_sentences = {
     'ace': [
@@ -109,6 +109,31 @@ def play_point(player1_name, player2_name):
     print_point_outcome(outcome, winner, player1_name, player2_name)
     return winner
 
+def convert_score(score):
+    if score == 0:
+        return "0"
+    elif score == 1:
+        return "15"
+    elif score == 2:
+        return "30"
+    elif score == 3:
+        return "40"
+    else:
+        return "Ad"
+
+def produce_point(player1_name, player1_points, player2_name, player2_points):
+    message = {
+        "match_id": match_id,
+        "event_type": "point",
+        "player1": player1_name,
+        'player1_score': player1_points,
+        'player2': player2_name,
+        'player2_score': player2_points
+        }
+    # Produce message
+    producer.produce(topic='tennis-match-events', key='match_id', value=json.dumps(message))
+    producer.flush()
+
 def play_game(player1_name, player2_name):
     """Simulates a single game and returns the winner."""
     player1_points = 0
@@ -116,17 +141,45 @@ def play_game(player1_name, player2_name):
 
     while True:
         winner = play_point(player1_name, player2_name)
-
         if winner == 0:
             player1_points += 1
         else:
             player2_points += 1
 
+        # if both players get advantage reset them to 40 each
+        if player1_points == 4 and player2_points == 4:
+            player1_points = 3
+            player2_points = 3
+
         if player1_points >= 4 and player1_points >= player2_points + 2:
+            # produce a message to reset points to 0 : 0
             return 0
         elif player2_points >= 4 and player2_points >= player1_points + 2:
+            # produce a message to reset points to 0 : 0
             return 1
-        
+
+        # Print the current score
+        player1_score = convert_score(player1_points)
+        player2_score = convert_score(player2_points)
+
+        produce_point(player1_name, player1_score, player2_name, player2_score)
+            
+        print(f"{player1_name}: {player1_score} - {player2_name}: {player2_score}")
+
+def produce_game(player1_name, player1_games, player2_name, player2_games):
+    message = {
+        "match_id": match_id,
+        "event_type": "game",
+        "player1": player1_name,
+        'player1_score': player1_games,
+        'player2': player2_name,
+        'player2_score': player2_games
+        }
+    # Produce message
+    producer.produce(topic='tennis-match-events', key='match_id', value=json.dumps(message))
+    producer.flush()
+
+
 def play_set(player1_name, player2_name):
     """Simulates a single set and returns the winner."""
     player1_games = 0
@@ -140,9 +193,28 @@ def play_set(player1_name, player2_name):
             player2_games += 1
 
         if player1_games >= 6 and player1_games >= player2_games + 2:
+            # produce a message to reset games to 0 : 0
             return 0
         elif player2_games >= 6 and player2_games >= player1_games + 2:
+            # produce a message to reset games to 0 : 0
             return 1
+        
+        produce_game(player1_name, player1_games, player2_name, player2_games)
+
+        print(f"{player1_name}: {player1_games} - {player2_name}: {player2_games}")
+
+def produce_set(player1_name, player1_sets, player2_name, player2_sets):
+    message = {
+        "match_id": match_id,
+        "event_type": "set",
+        "player1": player1_name,
+        'player1_score': player1_sets,
+        'player2': player2_name,
+        'player2_score': player2_sets
+        }
+    # Produce message
+    producer.produce(topic='tennis-match-events', key='match_id', value=json.dumps(message))
+    producer.flush()
 
 def play_match():
     """Simulates a full match and returns the winner."""
@@ -169,11 +241,14 @@ def play_match():
             winner_name = player2_name
             break
 
+        produce_set(player1_name, player1_sets, player2_name, player2_sets)
+
     # Send winner's name to Kafka topic
     message = {'winner': winner_name}
     producer.produce('tennis-match-events', value=json.dumps(message))
     producer.flush()
 
+    # produce message to see score of all sets
     return winner_name
             
 
