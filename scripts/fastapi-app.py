@@ -18,17 +18,26 @@ consumer = Consumer({
 })
 consumer.subscribe(['tennis-match-events'])
 
-# Global variable to store the winner
-winner = None
+# Global variables to store match data
+match_data = {
+    'player1': None,
+    'player2': None,
+    'player1_sets': 0,
+    'player2_sets': 0,
+    'player1_games': 0,
+    'player2_games': 0,
+    'player1_points': 0,
+    'player2_points': 0,
+    'winner': None
+}
 
 async def event_generator():
-    global winner
+    global match_data
     while True:
         msg = consumer.poll(0.1)  # Poll every 100 milliseconds
-
         if msg is None:
-            if winner:
-                yield f"data: {winner}\n\n"
+            if match_data['winner']:
+                yield f"data: {json.dumps(match_data)}\n\n"
             await asyncio.sleep(0.01)  # Sleep for a short time to avoid excessive CPU usage
             continue
         elif msg.error():
@@ -36,9 +45,24 @@ async def event_generator():
             continue
         else:
             message = msg.value().decode('utf-8')
-            winner_data = json.loads(message)
-            winner = winner_data.get('winner')
-            yield f"data: {winner}\n\n"
+            event_data = json.loads(message)
+            event_type = event_data.get('event_type')
+
+            if event_type == 'point':
+                match_data['player1'] = event_data.get('player1')
+                match_data['player2'] = event_data.get('player2')
+                match_data['player1_points'] = event_data.get('player1_score')
+                match_data['player2_points'] = event_data.get('player2_score')
+            elif event_type == 'game':
+                match_data['player1_games'] = event_data.get('player1_score')
+                match_data['player2_games'] = event_data.get('player2_score')
+            elif event_type == 'set':
+                match_data['player1_sets'] = event_data.get('player1_score')
+                match_data['player2_sets'] = event_data.get('player2_score')
+            elif 'winner' in event_data:
+                match_data['winner'] = event_data.get('winner')
+
+            yield f"data: {json.dumps(match_data)}\n\n"
 
 @app.get("/sse")
 async def sse_endpoint():
