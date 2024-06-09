@@ -50,7 +50,7 @@ This workflow automates the entire process of creating the synthetic match data,
 
 ##  :page_facing_up: Resources
 Link to the final project.\
-https://shaynelusser.com/tennis
+https://shaynelusser.com/projects/tennis-streaming
 
 Links to resources used during this project.
 https://cloud.google.com/run/docs (Google Cloud)\
