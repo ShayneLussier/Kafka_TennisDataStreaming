@@ -1,14 +1,10 @@
-from fastapi import FastAPI, Request
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 from confluent_kafka import Consumer
 import json
 import asyncio
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
 
 # Kafka consumer setup
 consumer = Consumer({
@@ -67,7 +63,3 @@ async def event_generator():
 @app.get("/sse")
 async def sse_endpoint():
     return StreamingResponse(event_generator(), media_type="text/event-stream")
-
-@app.get("/")
-async def read_index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
