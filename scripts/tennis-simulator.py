@@ -2,7 +2,6 @@ from faker import Faker
 from random import choice, randint
 import json
 import uuid
-import time
 from confluent_kafka import Producer
 
 #  ---------- SETUP ---------- #
