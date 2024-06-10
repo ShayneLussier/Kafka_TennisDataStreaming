@@ -4,7 +4,7 @@ The Tennis Match Simulator is a real-time application that generates synthetic t
 ## :ledger: Index
 
 - [About](#beginner-about)
-- [Tools](#tools)
+- [Tools](#toolbox-tools)
 - [How?](#zap-how)
 - [File Structure](#file_folder-file-structure)
 - [Resources](#page_facing_up-resources)
@@ -31,7 +31,7 @@ The following workflow is performed:
 
 ![Diagram](images/3x.png)
 
-This workflow automates the entire process of creating the synthetic match data, initializing cloud resources, all the way to displaying the data on the web page in real-time.
+This workflow automates the entire process of creating the synthetic match data, initializing cloud resources, all the way to displaying the data on the web page in real-time. Individual user sessions do not have dedicated partitions in Kafka's default configuration. It is possible to run this project concurrently with another user and have the scripts competing to be displayed!
 
 
 ##  :file_folder: File Structure
